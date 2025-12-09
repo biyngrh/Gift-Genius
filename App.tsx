@@ -38,10 +38,16 @@ const App: React.FC = () => {
   };
 
   const handleClearHistory = () => {
-    if (confirm('Are you sure you want to clear your history?')) {
+    if (confirm('Are you sure you want to clear your entire history?')) {
       setHistory([]);
       localStorage.removeItem('gift_genius_history');
     }
+  };
+
+  const handleDeleteHistoryItem = (id: string) => {
+    const updatedHistory = history.filter(item => item.id !== id);
+    setHistory(updatedHistory);
+    localStorage.setItem('gift_genius_history', JSON.stringify(updatedHistory));
   };
 
   const handleGenerate = async (e?: React.FormEvent) => {
@@ -89,10 +95,17 @@ const App: React.FC = () => {
           
           <button 
             onClick={() => setShowHistory(!showHistory)}
-            className={`p-2 rounded-full transition-colors ${showHistory ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-slate-100 text-slate-500'}`}
+            className={`p-2 rounded-full transition-colors relative ${showHistory ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-slate-100 text-slate-500'}`}
             aria-label="Toggle History"
           >
-            <HistoryIcon size={24} />
+            <div className="relative">
+              <HistoryIcon size={24} />
+              {history.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+                  {history.length}
+                </span>
+              )}
+            </div>
           </button>
         </div>
       </header>
@@ -167,12 +180,17 @@ const App: React.FC = () => {
                   <Sparkles size={20} className="text-yellow-500 fill-yellow-500" />
                   Top Picks For You
                 </h3>
-                <button 
-                  onClick={() => handleGenerate()} 
-                  className="text-indigo-600 text-sm font-semibold flex items-center gap-1 hover:underline"
-                >
-                  <RefreshCcw size={14} /> Regenerate
-                </button>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded-full">
+                    Saved to History
+                  </span>
+                  <button 
+                    onClick={() => handleGenerate()} 
+                    className="text-indigo-600 text-sm font-semibold flex items-center gap-1 hover:underline"
+                  >
+                    <RefreshCcw size={14} /> Regenerate
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -200,10 +218,11 @@ const App: React.FC = () => {
                  {history.length > 0 && (
                    <button 
                     onClick={handleClearHistory}
-                    className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                    title="Clear History"
+                    className="text-red-500 hover:bg-red-50 hover:text-red-600 p-2 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold"
+                    title="Clear All History"
                    >
-                     <Trash2 size={18} />
+                     <Trash2 size={14} />
+                     Clear All
                    </button>
                  )}
               </div>
@@ -221,6 +240,7 @@ const App: React.FC = () => {
                       key={item.id} 
                       item={item} 
                       onClick={handleLoadHistoryItem} 
+                      onDelete={handleDeleteHistoryItem}
                     />
                   ))}
                 </div>
