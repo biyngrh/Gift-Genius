@@ -17,3 +17,5 @@ export enum LoadingState {
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR'
 }
+
+export type Language = 'id' | 'en';

@@ -1,14 +1,19 @@
 import React from 'react';
-import { GiftHistoryItem } from '../types';
-import { Clock, Trash2, ChevronRight } from 'lucide-react';
+import { GiftHistoryItem, Language } from '../types';
+import { Clock, Trash2 } from 'lucide-react';
+import { translations } from '../utils/translations';
 
 interface HistoryItemProps {
   item: GiftHistoryItem;
   onClick: (item: GiftHistoryItem) => void;
   onDelete: (id: string) => void;
+  language: Language;
 }
 
-const HistoryItem: React.FC<HistoryItemProps> = ({ item, onClick, onDelete }) => {
+const HistoryItem: React.FC<HistoryItemProps> = ({ item, onClick, onDelete, language }) => {
+  const t = translations[language];
+  const locale = language === 'id' ? 'id-ID' : 'en-US';
+
   return (
     <div className="group relative flex bg-white/70 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-white/5 hover:border-purple-300 dark:hover:border-purple-500/30 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 mb-3 overflow-hidden shadow-sm hover:shadow-md dark:shadow-lg dark:shadow-black/20">
       <button 
@@ -17,7 +22,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ item, onClick, onDelete }) =>
       >
         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1.5">
           <Clock size={12} className="text-purple-500 dark:text-purple-400" />
-          {new Date(item.timestamp).toLocaleDateString()}
+          {new Date(item.timestamp).toLocaleDateString(locale)}
         </div>
         <p className="text-slate-800 dark:text-slate-200 font-medium line-clamp-1 text-sm mb-2.5 pr-2 group-hover:text-purple-700 dark:group-hover:text-white transition-colors">
           {item.description}
@@ -43,7 +48,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ item, onClick, onDelete }) =>
             onDelete(item.id);
           }}
           className="flex-1 w-10 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-          title="Remove from history"
+          title={t.deleteHistory}
         >
           <Trash2 size={14} />
         </button>
