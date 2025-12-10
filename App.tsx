@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Gift, Sparkles, History as HistoryIcon, Loader2, RefreshCcw, Trash2 } from 'lucide-react';
+import { Gift, Sparkles, History as HistoryIcon, Loader2, RefreshCcw, Trash2, Moon, Sun } from 'lucide-react';
 import { generateGiftIdeas } from './services/geminiService';
 import { GiftRecommendation, LoadingState, GiftHistoryItem } from './types';
 import GiftCard from './components/GiftCard';
@@ -12,6 +12,33 @@ const App: React.FC = () => {
   const [history, setHistory] = useState<GiftHistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  // Initialize theme
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    } else {
+      setTheme('light');
+    }
+  }, []);
+
+  // Apply theme to document
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   // Load history on mount
   useEffect(() => {
@@ -78,45 +105,59 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-x-hidden selection:bg-purple-500/30">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 relative overflow-x-hidden selection:bg-purple-500/30 transition-colors duration-500">
       
       {/* Background Glowing Orbs */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
-        <div className="absolute top-[40%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[100px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-400/20 dark:bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-pink-400/20 dark:bg-pink-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+        <div className="absolute top-[40%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-[100px]" />
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-slate-950/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-slate-200 dark:border-white/5 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl transition-colors duration-300">
         <div className="max-w-5xl mx-auto px-4 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => {
             setLoadingState(LoadingState.IDLE);
             setDescription('');
             setRecommendations([]);
           }}>
-            <div className="bg-gradient-to-br from-purple-600 to-pink-600 p-2.5 rounded-xl text-white shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow duration-300">
+            <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2.5 rounded-xl text-white shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow duration-300">
               <Gift size={22} className="group-hover:rotate-12 transition-transform duration-300" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white via-purple-100 to-white/70 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-800 via-purple-600 to-slate-800 dark:from-white dark:via-purple-100 dark:to-white/70 bg-clip-text text-transparent">
               Gift Genius
             </h1>
           </div>
           
-          <button 
-            onClick={() => setShowHistory(!showHistory)}
-            className={`p-3 rounded-xl transition-all relative border ${showHistory ? 'bg-purple-500/20 border-purple-500/30 text-purple-200' : 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-400 hover:text-white'}`}
-            aria-label="Toggle History"
-          >
-            <div className="relative">
-              <HistoryIcon size={20} />
-              {history.length > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-slate-950">
-                  {history.length}
-                </span>
-              )}
-            </div>
-          </button>
+          <div className="flex items-center gap-2">
+             <button
+              onClick={toggleTheme}
+              className="p-3 rounded-xl transition-all bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+              aria-label="Toggle Theme"
+             >
+               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+             </button>
+
+            <button 
+              onClick={() => setShowHistory(!showHistory)}
+              className={`p-3 rounded-xl transition-all relative border ${
+                showHistory 
+                  ? 'bg-purple-100 dark:bg-purple-500/20 border-purple-200 dark:border-purple-500/30 text-purple-600 dark:text-purple-200' 
+                  : 'bg-white/50 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+              }`}
+              aria-label="Toggle History"
+            >
+              <div className="relative">
+                <HistoryIcon size={20} />
+                {history.length > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-slate-50 dark:ring-slate-950">
+                    {history.length}
+                  </span>
+                )}
+              </div>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -127,11 +168,11 @@ const App: React.FC = () => {
           
           {/* Hero / Input Section */}
           <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight leading-tight">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight leading-tight text-slate-800 dark:text-slate-100">
               Gift giving, <br />
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">reimagined by AI.</span>
+              <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 dark:from-purple-400 dark:via-pink-400 dark:to-orange-400 bg-clip-text text-transparent">reimagined by AI.</span>
             </h2>
-            <p className="text-slate-400 text-lg mb-10 leading-relaxed font-light">
+            <p className="text-slate-600 dark:text-slate-400 text-lg mb-10 leading-relaxed font-light">
               Describe the person, their quirks, hobbies, and your budget. <br className="hidden md:block"/>
               We'll conjure up the perfect recommendations in seconds.
             </p>
@@ -140,12 +181,12 @@ const App: React.FC = () => {
               {/* Glowing ring effect */}
               <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl opacity-20 group-focus-within:opacity-70 blur transition duration-500"></div>
               
-              <div className="relative rounded-2xl bg-slate-950 overflow-hidden">
+              <div className="relative rounded-2xl bg-white dark:bg-slate-950 overflow-hidden transition-colors duration-300">
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Example: My younger sister, turning 24. She's into astrology, loves cozy aesthetic, and drinks too much iced coffee. Budget under 300k IDR."
-                  className="w-full p-6 pb-24 text-lg outline-none min-h-[180px] resize-none placeholder:text-slate-600 bg-slate-900/50 text-slate-100 focus:bg-slate-900/80 transition-colors backdrop-blur-sm"
+                  className="w-full p-6 pb-24 text-lg outline-none min-h-[180px] resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900/80 transition-colors backdrop-blur-sm"
                   disabled={loadingState === LoadingState.LOADING}
                 />
                 
@@ -154,7 +195,7 @@ const App: React.FC = () => {
                      <button
                       type="button"
                       onClick={() => setDescription('')}
-                      className="text-slate-500 hover:text-slate-300 px-3 py-2 text-sm font-medium transition-colors"
+                      className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 px-3 py-2 text-sm font-medium transition-colors"
                      >
                        Clear
                      </button>
@@ -162,7 +203,7 @@ const App: React.FC = () => {
                   <button
                     type="submit"
                     disabled={!description.trim() || loadingState === LoadingState.LOADING}
-                    className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-purple-900/20 border border-white/10"
+                    className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:from-slate-200 disabled:to-slate-300 dark:disabled:from-slate-800 dark:disabled:to-slate-800 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-purple-900/20 border border-white/10"
                   >
                     {loadingState === LoadingState.LOADING ? (
                       <>
@@ -183,9 +224,9 @@ const App: React.FC = () => {
 
           {/* Error Message */}
           {loadingState === LoadingState.ERROR && (
-            <div className="bg-red-500/10 text-red-200 p-4 rounded-xl border border-red-500/20 mb-10 flex items-center gap-3 justify-center backdrop-blur-md animate-fade-in">
-              <span className="font-semibold text-red-400">Error:</span> {errorMsg}
-              <button onClick={() => handleGenerate()} className="underline hover:text-white transition-colors">Try Again</button>
+            <div className="bg-red-500/10 text-red-600 dark:text-red-200 p-4 rounded-xl border border-red-500/20 mb-10 flex items-center gap-3 justify-center backdrop-blur-md animate-fade-in">
+              <span className="font-semibold text-red-500 dark:text-red-400">Error:</span> {errorMsg}
+              <button onClick={() => handleGenerate()} className="underline hover:text-red-800 dark:hover:text-white transition-colors">Try Again</button>
             </div>
           )}
 
@@ -193,16 +234,16 @@ const App: React.FC = () => {
           {recommendations.length > 0 && (
             <div className="animate-fade-in">
               <div className="flex items-center justify-between mb-8 px-2">
-                <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                   <div className="bg-yellow-500/20 p-1.5 rounded-lg">
-                    <Sparkles size={16} className="text-yellow-400 fill-yellow-400" />
+                    <Sparkles size={16} className="text-yellow-600 dark:text-yellow-400 fill-yellow-400" />
                   </div>
-                  Curated For You
+                  Recommendations for loved ones.
                 </h3>
                 <div className="flex items-center gap-4">
                   <button 
                     onClick={() => handleGenerate()} 
-                    className="text-purple-400 text-sm font-medium flex items-center gap-1.5 hover:text-purple-300 hover:bg-purple-500/10 px-3 py-1.5 rounded-lg transition-all"
+                    className="text-purple-600 dark:text-purple-400 text-sm font-medium flex items-center gap-1.5 hover:text-purple-800 dark:hover:text-purple-300 hover:bg-purple-500/10 px-3 py-1.5 rounded-lg transition-all"
                   >
                     <RefreshCcw size={14} /> Regenerate
                   </button>
@@ -225,15 +266,15 @@ const App: React.FC = () => {
           }`}
         >
           {/* Sidebar Content */}
-          <div className="h-full bg-slate-900/90 backdrop-blur-2xl border-l border-white/10 shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-white/5 bg-slate-900/50">
+          <div className="h-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-l border-slate-200 dark:border-white/10 shadow-2xl flex flex-col text-slate-900 dark:text-slate-100">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50">
                <div className="flex items-center gap-3">
-                 <HistoryIcon size={20} className="text-purple-400" />
-                 <h3 className="text-lg font-bold text-slate-100">Time Capsule</h3>
+                 <HistoryIcon size={20} className="text-purple-500 dark:text-purple-400" />
+                 <h3 className="text-lg font-bold">Time Capsule</h3>
                </div>
                <button 
                 onClick={() => setShowHistory(false)}
-                className="text-slate-400 hover:text-white p-2"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-2"
                >
                  Close
                </button>
@@ -242,11 +283,11 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
               {history.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
                     <HistoryIcon size={24} className="opacity-40" />
                   </div>
                   <p>No history yet.</p>
-                  <p className="text-xs mt-2 text-slate-600">Your magical discoveries will appear here.</p>
+                  <p className="text-xs mt-2 text-slate-400 dark:text-slate-600">Your magical discoveries will appear here.</p>
                 </div>
               ) : (
                 <div className="space-y-1">
@@ -263,10 +304,10 @@ const App: React.FC = () => {
             </div>
             
             {history.length > 0 && (
-              <div className="p-4 border-t border-white/5 bg-slate-900/50">
+              <div className="p-4 border-t border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50">
                  <button 
                   onClick={handleClearHistory}
-                  className="w-full text-red-400 hover:bg-red-500/10 hover:text-red-300 p-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm font-semibold"
+                  className="w-full text-red-500 dark:text-red-400 hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-300 p-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm font-semibold"
                  >
                    <Trash2 size={16} />
                    Clear All History
@@ -279,7 +320,7 @@ const App: React.FC = () => {
         {/* Backdrop for mobile history */}
         {showHistory && (
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" 
+            className="fixed inset-0 bg-slate-900/20 dark:bg-black/60 backdrop-blur-sm z-50" 
             onClick={() => setShowHistory(false)}
           ></div>
         )}
@@ -304,13 +345,22 @@ const App: React.FC = () => {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.02);
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
           background: rgba(255, 255, 255, 0.02);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.1);
           border-radius: 10px;
         }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+        }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.2);
         }
       `}</style>
