@@ -250,19 +250,19 @@ const App: React.FC = () => {
 
   // --- Sub-Components ---
 
+  // Updated NavButton for minimal desktop sidebar (Icon Only on Desktop)
   const NavButton = ({ id, icon: Icon, label, active, onClick }: { id?: string, icon: any, label: string, active: boolean, onClick: () => void }) => (
     <button 
       onClick={onClick}
-      className={`flex items-center justify-start px-4 py-3 rounded-xl w-full transition-all duration-300 group relative ${
+      className={`flex items-center justify-center p-3 rounded-xl w-full transition-all duration-300 group relative ${
         active 
           ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30' 
           : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/10'
       }`}
+      title={label} // Tooltip for accessibility since text is hidden on desktop
     >
-      <Icon size={20} className={`${active ? 'animate-pulse-slow' : 'group-hover:scale-110 transition-transform'} mr-3`} />
-      <span className="font-medium text-sm md:text-base whitespace-nowrap">
-        {label}
-      </span>
+      <Icon size={22} className={`${active ? 'animate-pulse-slow' : 'group-hover:scale-110 transition-transform'}`} />
+      {/* Hidden label on desktop, simple tooltip effect could be added here if needed via CSS group-hover */}
     </button>
   );
 
@@ -341,18 +341,17 @@ const App: React.FC = () => {
       {!showLanding && (
         <div className="animate-fade-in flex flex-col md:flex-row min-h-screen">
           
-          {/* DESKTOP SIDEBAR */}
-          <aside className="hidden md:flex flex-col fixed h-full w-64 z-40 bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl border-r border-slate-200 dark:border-white/5 p-6">
-             {/* Logo */}
-             <div className="flex items-center gap-2 mb-6 cursor-pointer" onClick={handleBackToHome}>
-                <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2 rounded-lg text-white shadow-lg shadow-purple-500/20">
+          {/* DESKTOP SIDEBAR - Narrow Rail Style (w-20) */}
+          <aside className="hidden md:flex flex-col fixed h-full w-20 z-40 bg-white/60 dark:bg-slate-950/60 backdrop-blur-2xl border-r border-slate-200 dark:border-white/5 py-6 items-center">
+             {/* Logo - Icon Only */}
+             <div className="flex items-center justify-center mb-8 cursor-pointer hover:scale-110 transition-transform" onClick={handleBackToHome} title="Gift Genius Home">
+                <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2.5 rounded-xl text-white shadow-lg shadow-purple-500/20">
                   <Gift size={24} />
                 </div>
-                <h1 className="text-2xl font-extrabold tracking-tight">Gift Genius</h1>
              </div>
 
-             {/* Utility Buttons (Home, Language, Theme) - Moved to top */}
-             <div className="space-y-1 mb-6 pb-6 border-b border-slate-200 dark:border-white/5">
+             {/* Utility Buttons - Icons Only */}
+             <div className="space-y-3 w-full px-3 mb-6 pb-6 border-b border-slate-200 dark:border-white/5 flex flex-col items-center">
                 <NavButton 
                   onClick={handleBackToHome} 
                   icon={Home} 
@@ -362,7 +361,7 @@ const App: React.FC = () => {
                 <NavButton 
                   onClick={toggleLanguage} 
                   icon={Globe} 
-                  label={language === 'id' ? 'Bahasa' : 'English'} 
+                  label={language === 'id' ? 'Switch Language' : 'Ganti Bahasa'} 
                   active={false} 
                />
                 <NavButton 
@@ -373,8 +372,8 @@ const App: React.FC = () => {
                />
              </div>
 
-             {/* Main Navigation (Oracle & Alchemy) */}
-             <nav className="flex-1 space-y-2">
+             {/* Main Navigation - Icons Only */}
+             <nav className="flex-1 space-y-3 w-full px-3 flex flex-col items-center">
                <NavButton 
                   onClick={() => setActiveTab('oracle')} 
                   icon={Sparkles} 
@@ -390,22 +389,29 @@ const App: React.FC = () => {
              </nav>
           </aside>
 
-          {/* MAIN CONTENT AREA */}
-          <main className="flex-1 pb-24 md:pb-12 pt-6 px-4 md:px-12 max-w-7xl mx-auto w-full md:ml-64">
+          {/* MAIN CONTENT AREA - Adjusted margin for narrower sidebar */}
+          <main className="flex-1 pb-24 md:pb-12 pt-6 px-4 md:px-12 max-w-7xl mx-auto w-full md:ml-20 transition-all">
             
-            {/* Header Mobile Only */}
-            <div className="md:hidden flex items-center justify-between mb-8">
+            {/* Header Mobile Only - Improved Layout */}
+            <div className="md:hidden flex items-center justify-between mb-8 sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md py-4 -mx-4 px-4 border-b border-slate-200 dark:border-white/5">
                <div className="flex items-center gap-2" onClick={handleBackToHome}>
                   <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2 rounded-lg text-white">
                     <Gift size={20} />
                   </div>
                   <h1 className="text-xl font-extrabold tracking-tight">Gift Genius</h1>
                </div>
-               <div className="flex gap-2">
-                 <button onClick={toggleTheme} className="p-2 bg-white/50 dark:bg-white/5 rounded-full"><Sun size={20} /></button>
-                 <button onClick={() => setShowHistory(!showHistory)} className="p-2 bg-white/50 dark:bg-white/5 rounded-full relative">
+               
+               {/* Mobile Utility Group: Language, Theme, History */}
+               <div className="flex gap-2 items-center">
+                 <button onClick={toggleLanguage} className="p-2 bg-white/50 dark:bg-white/5 rounded-full border border-slate-100 dark:border-white/5 text-xl leading-none">
+                    {language === 'id' ? '🇮🇩' : '🇺🇸'}
+                 </button>
+                 <button onClick={toggleTheme} className="p-2 bg-white/50 dark:bg-white/5 rounded-full border border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400">
+                    <Sun size={20} />
+                 </button>
+                 <button onClick={() => setShowHistory(!showHistory)} className="p-2 bg-white/50 dark:bg-white/5 rounded-full border border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400 relative">
                     <HistoryIcon size={20} />
-                    {history.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full"/>}
+                    {history.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-slate-50 dark:border-slate-900"/>}
                  </button>
                </div>
             </div>
@@ -838,7 +844,8 @@ const App: React.FC = () => {
                 <span className="text-[10px] font-bold">{t.menuOracle}</span>
              </button>
              
-             <div className="relative -top-6">
+             {/* Centered Home Button */}
+             <div className="absolute left-1/2 -top-6 transform -translate-x-1/2">
                 <button onClick={handleBackToHome} className="bg-gradient-to-tr from-purple-500 to-pink-500 p-4 rounded-full text-white shadow-lg shadow-purple-500/30">
                    <Home size={24} />
                 </button>
