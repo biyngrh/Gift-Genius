@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Gift, Sparkles, History as HistoryIcon, Loader2, RefreshCcw, Moon, Sun, Camera, X, ChevronDown, ArrowRight, Home } from 'lucide-react';
+import { Gift, Sparkles, History as HistoryIcon, Loader2, RefreshCcw, Moon, Sun, Camera, X, ChevronDown, ArrowRight, Home, Music, Star } from 'lucide-react';
 import { generateGiftIdeas } from './services/geminiService';
 import { GiftRecommendation, LoadingState, GiftHistoryItem, Language } from './types';
 import GiftCard from './components/GiftCard';
@@ -24,6 +24,11 @@ const App: React.FC = () => {
   const [budgetIndex, setBudgetIndex] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Deep Dive States
+  const [showDeepDive, setShowDeepDive] = useState(false);
+  const [zodiac, setZodiac] = useState('');
+  const [music, setMusic] = useState('');
+
   // Landing Page State
   const [showLanding, setShowLanding] = useState(true);
   const [isExitingLanding, setIsExitingLanding] = useState(false);
@@ -32,6 +37,12 @@ const App: React.FC = () => {
   const vibes = [
     "Creative", "Minimalist", "Gamer", "Cozy", 
     "Luxury", "Vintage", "Tech Lover", "Plant Parent"
+  ];
+
+  const zodiacOptions = [
+    "Aries ♈", "Taurus ♉", "Gemini ♊", "Cancer ♋",
+    "Leo ♌", "Virgo ♍", "Libra ♎", "Scorpio ♏",
+    "Sagittarius ♐", "Capricorn ♑", "Aquarius ♒", "Pisces ♓"
   ];
 
   // --- Derived Data based on Language ---
@@ -98,7 +109,7 @@ const App: React.FC = () => {
   };
 
   const saveToHistory = (desc: string, recs: GiftRecommendation[]) => {
-    const currentOccasionText = (t.occasions as any)[occasionKey];
+    const currentOccasion = (t.occasions as any)[occasionKey];
     
     const newItem: GiftHistoryItem = {
       id: Date.now().toString(),
@@ -128,7 +139,9 @@ const App: React.FC = () => {
         imageBase64: selectedImage || undefined,
         occasion: currentOccasion,
         budget: currentBudget,
-        language
+        language,
+        zodiac: showDeepDive ? zodiac : undefined,
+        music: showDeepDive ? music : undefined
       });
       setRecommendations(results);
       setLoadingState(LoadingState.SUCCESS);
@@ -429,14 +442,62 @@ const App: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Text Description */}
-                    <div className="flex-1">
+                    {/* Text Description & Deep Dive Inputs */}
+                    <div className="flex-1 flex flex-col gap-3">
                       <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder={t.descPlaceholder}
-                        className="w-full h-full min-h-[160px] p-4 text-base outline-none resize-none rounded-2xl bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 border border-transparent focus:bg-white dark:focus:bg-black/40 focus:ring-2 focus:ring-purple-500/50 transition-all"
+                        className="w-full h-full min-h-[120px] p-4 text-base outline-none resize-none rounded-2xl bg-slate-50 dark:bg-black/20 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 border border-transparent focus:bg-white dark:focus:bg-black/40 focus:ring-2 focus:ring-purple-500/50 transition-all"
                       />
+                      
+                      {/* Deep Dive Toggle */}
+                      <button 
+                        type="button"
+                        onClick={() => setShowDeepDive(!showDeepDive)}
+                        className="self-start text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 flex items-center gap-1 transition-colors"
+                      >
+                        {showDeepDive ? t.hideCosmicDetails : t.addCosmicDetails}
+                      </button>
+
+                      {/* Deep Dive Inputs Panel */}
+                      {showDeepDive && (
+                        <div className="animate-fade-in grid grid-cols-1 md:grid-cols-2 gap-3 mt-1 bg-purple-50/50 dark:bg-purple-900/10 p-3 rounded-xl border border-purple-100 dark:border-purple-500/20">
+                           {/* Zodiac Selector */}
+                           <div className="space-y-1">
+                             <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                               <Star size={10} /> {t.zodiacLabel}
+                             </label>
+                             <div className="relative">
+                               <select 
+                                  value={zodiac}
+                                  onChange={(e) => setZodiac(e.target.value)}
+                                  className="w-full text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-purple-500 outline-none appearance-none"
+                               >
+                                 <option value="">{t.zodiacPlaceholder}</option>
+                                 {zodiacOptions.map(z => (
+                                   <option key={z} value={z}>{z}</option>
+                                 ))}
+                               </select>
+                               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                             </div>
+                           </div>
+
+                           {/* Music Vibe Input */}
+                           <div className="space-y-1">
+                             <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                               <Music size={10} /> {t.musicLabel}
+                             </label>
+                             <input 
+                               type="text"
+                               value={music}
+                               onChange={(e) => setMusic(e.target.value)}
+                               placeholder={t.musicPlaceholder}
+                               className="w-full text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-purple-500 outline-none"
+                             />
+                           </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 

@@ -32,6 +32,14 @@ export const translations = {
     descPlaceholder: "Deskripsikan mereka... (misal: Ayahku yang suka berkebun tapi benci suara bising, atau sahabatku yang terobsesi dengan matcha dan kucing).",
     disclaimer: "*AI menggunakan gambar untuk mendeteksi estetika & aura saja.",
     
+    // Deep Dive Inputs
+    addCosmicDetails: "Tambah Detail Kosmik (+)",
+    hideCosmicDetails: "Sembunyikan Detail (-)",
+    zodiacLabel: "Zodiak",
+    zodiacPlaceholder: "Pilih Zodiak...",
+    musicLabel: "Vibe Musik",
+    musicPlaceholder: "Artis/Genre (cth: Taylor Swift, Jazz)",
+
     // Buttons
     btnLoadingReading: "Sedang Membaca Aura...",
     btnLoadingConsulting: "Konsultasi dengan Roh...",
@@ -101,6 +109,14 @@ export const translations = {
     descPlaceholder: "Describe them... (e.g., My dad who loves gardening but hates loud noises, or my best friend obsessed with matcha and cats).",
     disclaimer: "*AI uses the image to detect aesthetics & aura only.",
     
+    // Deep Dive Inputs
+    addCosmicDetails: "Add Cosmic Details (+)",
+    hideCosmicDetails: "Hide Details (-)",
+    zodiacLabel: "Zodiac",
+    zodiacPlaceholder: "Select Sign...",
+    musicLabel: "Sonic Vibe",
+    musicPlaceholder: "Artist/Genre (e.g., Taylor Swift, Jazz)",
+
     // Buttons
     btnLoadingReading: "Reading Aura...",
     btnLoadingConsulting: "Consulting Spirits...",

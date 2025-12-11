@@ -10,6 +10,8 @@ interface GenerateOptions {
   occasion: string;
   budget: string;
   language: Language;
+  zodiac?: string; // New Optional Field
+  music?: string;  // New Optional Field
 }
 
 export const generateGiftIdeas = async ({ 
@@ -17,7 +19,9 @@ export const generateGiftIdeas = async ({
   imageBase64, 
   occasion, 
   budget,
-  language
+  language,
+  zodiac,
+  music
 }: GenerateOptions): Promise<GiftRecommendation[]> => {
   try {
     const model = "gemini-2.5-flash";
@@ -27,15 +31,44 @@ export const generateGiftIdeas = async ({
     // Construct the prompt context based on language
     let promptText = "";
 
+    // Additional context string for Deep Dive inputs
+    const deepDiveContextId = `
+      INFO TAMBAHAN (Sangat Penting):
+      ${zodiac ? `- Zodiak Penerima: ${zodiac}` : ''}
+      ${music ? `- Selera Musik/Vibe: ${music}` : ''}
+
+      INSTRUKSI KHUSUS ZODIAK & MUSIK:
+      Jika data Zodiak atau Musik diberikan, gunakan itu untuk mempersonalisasi gaya kado secara mendalam.
+      Contoh logika: 
+      - Zodiak Leo + Musik Pop = Kado yang 'Stand out', Trendy, dan pusat perhatian.
+      - Zodiak Virgo + Musik Klasik = Kado yang terorganisir, bersih, minimalis, dan elegan.
+      - Zodiak Pisces + Musik Indie = Kado yang dreamy, artistik, dan sentimental.
+    `;
+
+    const deepDiveContextEn = `
+      ADDITIONAL INFO (Very Important):
+      ${zodiac ? `- Recipient Zodiac: ${zodiac}` : ''}
+      ${music ? `- Music Taste/Vibe: ${music}` : ''}
+
+      SPECIAL INSTRUCTIONS FOR ZODIAC & MUSIC:
+      If Zodiac or Music data is provided, use it to deeply personalize the gift style.
+      Logic examples:
+      - Zodiac Leo + Pop Music = Gifts that are 'Stand out', Trendy, and attention-grabbing.
+      - Zodiac Virgo + Classical Music = Gifts that are organized, clean, minimalist, and elegant.
+      - Zodiac Pisces + Indie Music = Gifts that are dreamy, artistic, and sentimental.
+    `;
+
     if (isId) {
       promptText = `
       Bertindaklah sebagai Orakel Kado (Gift Oracle).
       
-      KONTEKS:
+      KONTEKS UTAMA:
       - Acara: ${occasion}
       - Batas Anggaran: ${budget}
       - Deskripsi Penerima: "${description}"
       - Bahasa Output: Bahasa Indonesia
+
+      ${(zodiac || music) ? deepDiveContextId : ''}
       
       TUGAS:
       Analisis input (dan gambar jika ada) untuk mendeteksi "Aura" atau estetika penerima.
@@ -51,11 +84,13 @@ export const generateGiftIdeas = async ({
       promptText = `
       Act as a Gift Oracle.
       
-      CONTEXT:
+      MAIN CONTEXT:
       - Occasion: ${occasion}
       - Budget Limit: ${budget}
       - Recipient Description: "${description}"
       - Output Language: English
+
+      ${(zodiac || music) ? deepDiveContextEn : ''}
       
       TASK:
       Analyze inputs (and image if present) to detect the recipient's "Aura" or aesthetic.
