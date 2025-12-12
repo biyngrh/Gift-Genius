@@ -390,8 +390,9 @@ const App: React.FC = () => {
           </aside>
 
           {/* MAIN CONTENT AREA - Adjusted margin for narrower sidebar */}
-          <main className="flex-1 pb-24 md:pb-12 pt-6 px-4 md:px-12 max-w-7xl mx-auto w-full md:ml-20 transition-all">
+          <main className="flex-1 md:ml-20 transition-all relative">
             
+            <div className="max-w-7xl mx-auto px-4 md:px-12 pt-6 pb-24 md:pb-12 w-full">
             {/* Header Mobile Only - Improved Layout */}
             <div className="md:hidden flex items-center justify-between mb-8 sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md py-4 -mx-4 px-4 border-b border-slate-200 dark:border-white/5">
                <div className="flex items-center gap-2" onClick={handleBackToHome}>
@@ -415,19 +416,6 @@ const App: React.FC = () => {
                  </button>
                </div>
             </div>
-
-            {/* Desktop History Button (Absolute Top Right) */}
-            <button 
-              onClick={() => setShowHistory(!showHistory)} 
-              className="hidden md:flex absolute top-6 right-6 p-3 rounded-xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:bg-white/80 dark:hover:bg-white/10 transition-all z-30"
-            >
-               <HistoryIcon size={20} />
-               {history.length > 0 && (
-                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-500 text-[10px] font-bold text-white">
-                   {history.length}
-                 </span>
-               )}
-            </button>
 
             {/* Content Switcher */}
             {activeTab === 'oracle' ? (
@@ -785,6 +773,20 @@ const App: React.FC = () => {
                   )}
                </div>
             )}
+            </div>
+
+            {/* Desktop History Button (Absolute Top Right) */}
+            <button 
+              onClick={() => setShowHistory(!showHistory)} 
+              className="hidden md:flex absolute top-6 right-6 p-3 rounded-xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:bg-white/80 dark:hover:bg-white/10 transition-all z-30"
+            >
+               <HistoryIcon size={20} />
+               {history.length > 0 && (
+                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-500 text-[10px] font-bold text-white">
+                   {history.length}
+                 </span>
+               )}
+            </button>
 
             {/* History Sidebar (Shared) */}
             <div 
